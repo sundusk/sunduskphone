@@ -7,229 +7,83 @@
 //
 
 #import "SunduskModelViewController.h"
-#import <sys/utsname.h>
-@interface SunduskModelViewController ()
 
+#import <Masonry.h>
+#import "CCQiPhoneXQViewController.h"
+@interface SunduskModelViewController ()
+@property (nonatomic, weak)UIView *iPhoneInforView;
 @end
 
 @implementation SunduskModelViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    //1.手机系统版本：10.3
-    
-    NSString* phoneVersion = [[UIDevice currentDevice] systemVersion];
-    
-    //2.手机类型：iPhone 6
-    
-    NSString* phoneModel = [self iphoneType];//方法在下面
-    
-    //3.手机系统：iPhone OS
-    
-    NSString * iponeM = [[UIDevice currentDevice] systemName];
-    
-    //4.电池电量
-    
-    //打开电池的监听
-    
-    [UIDevice currentDevice].batteryMonitoringEnabled = YES;
-    
-    //获取电池的状态
-    
-    UIDeviceBatteryState BatteryState = [UIDevice currentDevice].batteryState;
-    
-    //获取剩余电量 范围在0.000000 至 1.000000之间
-    
-    CGFloat batterylevel = [UIDevice currentDevice].batteryLevel;
     
     
+    self.view.backgroundColor = [UIColor blueColor];
+    UIView *iPhoneInforView = [[UIView alloc]init];
+    iPhoneInforView.backgroundColor = [UIColor redColor];
+    self.iPhoneInforView = iPhoneInforView;
+    [self.view addSubview:iPhoneInforView];
     
-    //battery的状态  [UIDevice currentDevice].batteryState分为
+    [self setUp];
     
+
+}
+// 布局
+- (void)setUp{
+    NSLog(@"布局成功");
     
-   // UIDeviceBatteryStateUnknown,     未知
-    
-   // UIDeviceBatteryStateUnplugged,   // 未充电
-    
-   // UIDeviceBatteryStateCharging,     // 正在充电
-    
-   // UIDeviceBatteryStateFull,             // 满电
-    NSLog(@"phoneVersion %@",phoneVersion);
-    NSLog(@"phoneModel %@",phoneModel);
-    NSLog(@"iponeM %@",iponeM);
-    if (BatteryState == UIDeviceBatteryStateUnknown) {
+    [_iPhoneInforView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.size.mas_equalTo(CGSizeMake(100, 100));
+        make.center.equalTo(self.view);
+         // make.width.equalTo(@100);
+        //  make.height.mas_equalTo(100);
+        //        make.centerX.equalTo(self.view);
+        //        make.centerY.equalTo(self.view);
         
-        NSLog(@"unknow");
-        
-    }else{
-        
-        NSLog(@"know");
-        
-        //将剩余的电量用label显示。
-        
-//        self.current.text = [NSString stringWithFormat:@"%f",batterylevel];
-        
-        NSLog(@"%f",batterylevel);
-        
-        
-    }
+        //约束的代码
+//
+//        //设置View的顶部距离父控件的顶部20
+//        //        make.top.equalTo(self.view.mas_top).offset(20);
+//        make.top.equalTo(self.view).offset(20);
+//
+//        //如果设置约束的控件的属性和参照的控件的属性一致，被参照的控件的属性可以省略不写
+//        make.left.equalTo(self.view).offset(20);
+//
+//        make.bottom.equalTo(self.view).offset(-20);
+//
+//        make.right.equalTo(self.view).offset(-20);
+    }];
+   
+    
+    UIButton *iPhoneButton = [[UIButton alloc]init];
     
     
+    iPhoneButton.backgroundColor = [UIColor yellowColor];
+    [iPhoneButton addTarget:self action:@selector(BthClick:) forControlEvents:UIControlEventTouchUpInside];
+    [_iPhoneInforView addSubview:iPhoneButton];
+    [iPhoneButton setTitle:@"手机详情" forState:UIControlStateNormal];
+    [iPhoneButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    iPhoneButton.titleLabel.font = [UIFont systemFontOfSize:10];
+   
+    [iPhoneButton mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(_iPhoneInforView).offset(20);
+        make.right.equalTo(_iPhoneInforView).offset(-20);
+        make.top.equalTo(_iPhoneInforView).offset(20);
+        make.bottom.equalTo(_iPhoneInforView).offset(-20);
+    }];
     
     
+}
+- (void)BthClick:(UIButton *)btn{
+    NSLog(@"点击跳转到此页面");
     
-    
-    
-    
-    
+    CCQiPhoneXQViewController *vc2=[[CCQiPhoneXQViewController alloc] init];
+    [self presentModalViewController:vc2 animated:YES];
     
 }
 
-- (NSString*)iphoneType {
-    
-    //需要导入头文件：#import <sys/utsname.h>
-    
-    struct utsname systemInfo;
-    
-    uname(&systemInfo);
-    
-    NSString*platform = [NSString stringWithCString: systemInfo.machine encoding:NSASCIIStringEncoding];
-    
-    if([platform isEqualToString:@"iPhone1,1"])  return@"iPhone 2G";
-    
-    if([platform isEqualToString:@"iPhone1,2"])  return@"iPhone 3G";
-    
-    if([platform isEqualToString:@"iPhone2,1"])  return@"iPhone 3GS";
-    
-    if([platform isEqualToString:@"iPhone3,1"])  return@"iPhone 4";
-    
-    if([platform isEqualToString:@"iPhone3,2"])  return@"iPhone 4";
-    
-    if([platform isEqualToString:@"iPhone3,3"])  return@"iPhone 4";
-    
-    if([platform isEqualToString:@"iPhone4,1"])  return@"iPhone 4S";
-    
-    if([platform isEqualToString:@"iPhone5,1"])  return@"iPhone 5";
-    
-    if([platform isEqualToString:@"iPhone5,2"])  return@"iPhone 5";
-    
-    if([platform isEqualToString:@"iPhone5,3"])  return@"iPhone 5c";
-    
-    if([platform isEqualToString:@"iPhone5,4"])  return@"iPhone 5c";
-    
-    if([platform isEqualToString:@"iPhone6,1"])  return@"iPhone 5s";
-    
-    if([platform isEqualToString:@"iPhone6,2"])  return@"iPhone 5s";
-    
-    if([platform isEqualToString:@"iPhone7,1"])  return@"iPhone 6 Plus";
-    
-    if([platform isEqualToString:@"iPhone7,2"])  return@"iPhone 6";
-    
-    if([platform isEqualToString:@"iPhone8,1"])  return@"iPhone 6s";
-    
-    if([platform isEqualToString:@"iPhone8,2"])  return@"iPhone 6s Plus";
-    
-    if([platform isEqualToString:@"iPhone8,4"])  return@"iPhone SE";
-    
-    if([platform isEqualToString:@"iPhone9,1"])  return@"iPhone 7";
-    
-    if([platform isEqualToString:@"iPhone9,3"])  return@"iPhone 7";
-    
-    if([platform isEqualToString:@"iPhone9,2"])  return@"iPhone 7 Plus";
-    
-    if([platform isEqualToString:@"iPhone9,4"])  return@"iPhone 7 Plus";
-    
-    if([platform isEqualToString:@"iPhone10,1"]) return@"iPhone 8";
-    
-    if([platform isEqualToString:@"iPhone10,4"]) return@"iPhone 8";
-    
-    if([platform isEqualToString:@"iPhone10,2"]) return@"iPhone 8 Plus";
-    
-    if([platform isEqualToString:@"iPhone10,5"]) return@"iPhone 8 Plus";
-    
-    if([platform isEqualToString:@"iPhone10,3"]) return@"iPhone X";
-    
-    if([platform isEqualToString:@"iPhone10,6"]) return@"iPhone X";
-    
-    if([platform isEqualToString:@"iPod1,1"])  return@"iPod Touch 1G";
-    
-    if([platform isEqualToString:@"iPod2,1"])  return@"iPod Touch 2G";
-    
-    if([platform isEqualToString:@"iPod3,1"])  return@"iPod Touch 3G";
-    
-    if([platform isEqualToString:@"iPod4,1"])  return@"iPod Touch 4G";
-    
-    if([platform isEqualToString:@"iPod5,1"])  return@"iPod Touch 5G";
-    
-    if([platform isEqualToString:@"iPad1,1"])  return@"iPad 1G";
-    
-    if([platform isEqualToString:@"iPad2,1"])  return@"iPad 2";
-    
-    if([platform isEqualToString:@"iPad2,2"])  return@"iPad 2";
-    
-    if([platform isEqualToString:@"iPad2,3"])  return@"iPad 2";
-    
-    if([platform isEqualToString:@"iPad2,4"])  return@"iPad 2";
-    
-    if([platform isEqualToString:@"iPad2,5"])  return@"iPad Mini 1G";
-    
-    if([platform isEqualToString:@"iPad2,6"])  return@"iPad Mini 1G";
-    
-    if([platform isEqualToString:@"iPad2,7"])  return@"iPad Mini 1G";
-    
-    if([platform isEqualToString:@"iPad3,1"])  return@"iPad 3";
-    
-    if([platform isEqualToString:@"iPad3,2"])  return@"iPad 3";
-    
-    if([platform isEqualToString:@"iPad3,3"])  return@"iPad 3";
-    
-    if([platform isEqualToString:@"iPad3,4"])  return@"iPad 4";
-    
-    if([platform isEqualToString:@"iPad3,5"])  return@"iPad 4";
-    
-    if([platform isEqualToString:@"iPad3,6"])  return@"iPad 4";
-    
-    if([platform isEqualToString:@"iPad4,1"])  return@"iPad Air";
-    
-    if([platform isEqualToString:@"iPad4,2"])  return@"iPad Air";
-    
-    if([platform isEqualToString:@"iPad4,3"])  return@"iPad Air";
-    
-    if([platform isEqualToString:@"iPad4,4"])  return@"iPad Mini 2G";
-    
-    if([platform isEqualToString:@"iPad4,5"])  return@"iPad Mini 2G";
-    
-    if([platform isEqualToString:@"iPad4,6"])  return@"iPad Mini 2G";
-    
-    if([platform isEqualToString:@"iPad4,7"])  return@"iPad Mini 3";
-    
-    if([platform isEqualToString:@"iPad4,8"])  return@"iPad Mini 3";
-    
-    if([platform isEqualToString:@"iPad4,9"])  return@"iPad Mini 3";
-    
-    if([platform isEqualToString:@"iPad5,1"])  return@"iPad Mini 4";
-    
-    if([platform isEqualToString:@"iPad5,2"])  return@"iPad Mini 4";
-    
-    if([platform isEqualToString:@"iPad5,3"])  return@"iPad Air 2";
-    
-    if([platform isEqualToString:@"iPad5,4"])  return@"iPad Air 2";
-    
-    if([platform isEqualToString:@"iPad6,3"])  return@"iPad Pro 9.7";
-    
-    if([platform isEqualToString:@"iPad6,4"])  return@"iPad Pro 9.7";
-    
-    if([platform isEqualToString:@"iPad6,7"])  return@"iPad Pro 12.9";
-    
-    if([platform isEqualToString:@"iPad6,8"])  return@"iPad Pro 12.9";
-    
-    if([platform isEqualToString:@"i386"])  return@"iPhone Simulator";
-    
-    if([platform isEqualToString:@"x86_64"])  return@"iPhone Simulator";
-    
-    return platform;
-    
-}
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
