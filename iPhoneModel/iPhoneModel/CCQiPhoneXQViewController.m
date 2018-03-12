@@ -4,11 +4,12 @@
 //
 //  Created by sundusk on 2018/3/12.
 //  Copyright © 2018年 sundusk. All rights reserved.
-//
+//  手机显示的版本号 电量 网络状态
 
 #import "CCQiPhoneXQViewController.h"
 #import <Masonry.h>
 #import <sys/utsname.h>
+#import <AFNetworking.h>
 
 @interface CCQiPhoneXQViewController ()
 
@@ -24,19 +25,22 @@
     [self setup];
     
     
+    
 }
 - (void)setup{
     UILabel *phoneVersionLabel = [[UILabel alloc]init];
     UILabel *phoneModelLabel = [[UILabel alloc]init];
     UILabel *iphoneMLabel = [[UILabel alloc]init];
-    UILabel *batterylevelLabel = [[UILabel alloc]init];
-       [self.view addSubview:phoneModelLabel];
-        [self.view addSubview:phoneVersionLabel];
-        [self.view addSubview:iphoneMLabel];
-        [self.view addSubview:batterylevelLabel];
+    UILabel *batterylevelLabel = [[UILabel alloc]init];//手机剩余电量
+    UILabel *batterylevelStateLabel = [[UILabel alloc]init]; // 电量状况
+    UILabel *networkStateLabel = [[UILabel alloc]init];// 网络状态
+    [self.view addSubview:phoneModelLabel];
+    [self.view addSubview:phoneVersionLabel];
+    [self.view addSubview:iphoneMLabel];
+    [self.view addSubview:batterylevelLabel];
+    [self.view addSubview:batterylevelStateLabel];
+    [self.view addSubview:networkStateLabel];
     
-    
-
     
     //1.手机系统版本：10.3
     
@@ -82,49 +86,99 @@
     // UIDeviceBatteryStateFull,             // 满电
     if (BatteryState == UIDeviceBatteryStateUnknown) {
         
-        batterylevelLabel.text = [NSString stringWithFormat:@"剩余电量：模拟器没有电量"];
+        batterylevelStateLabel.text = @"电量状态：未知状态";
         
     }else{
         
-        NSLog(@"know");
+        
         
         //将剩余的电量用label显示。
         
-        batterylevelLabel.text = [NSString stringWithFormat:@"剩余电量 %f",batterylevel];
-        
-        NSLog(@"剩余电量 %f",batterylevel);
-        
+        batterylevelLabel.text = [NSString stringWithFormat:@"剩余电量： %f",batterylevel];
+        if (BatteryState == UIDeviceBatteryStateUnplugged) {
+            batterylevelStateLabel.text = @"电量状态：未充电";
+        }
+        if (BatteryState == UIDeviceBatteryStateCharging) {
+            batterylevelStateLabel.text = @"电量状态：正在充电";
+        }
+        if (BatteryState == UIDeviceBatteryStateFull) {
+            batterylevelStateLabel.text = @"电量状态：满电";
+        }
         
     }
     
+    //
+    [[AFNetworkReachabilityManager sharedManager] startMonitoring];
+    [[AFNetworkReachabilityManager sharedManager] setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
+        switch (status) {
+            case -1:
+                NSLog(@"未知网络");
+                networkStateLabel.text = @"未知网络";
+                break;
+            case 0:
+                NSLog(@"网络不可用");
+                networkStateLabel.text = @"网络不可用";
+                break;
+            case 1:
+            {
+                NSLog(@"GPRS网络");
+                networkStateLabel.text = @"正在使用移动网路";
+                //发通知，带头搞事
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"monitorNetworking" object:@"1" userInfo:nil];
+            }
+                break;
+            case 2:
+            {
+                NSLog(@"wifi网络");
+                networkStateLabel.text = @"正在使用WiFi";
+                //发通知，搞事情
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"monitorNetworking" object:@"2" userInfo:nil];
+            }
+                break;
+            default:
+                break;
+        }
+        if (status == AFNetworkReachabilityStatusReachableViaWWAN || status == AFNetworkReachabilityStatusReachableViaWiFi) {
+            NSLog(@"有网");
+        }else{
+            NSLog(@"没网");
+        }
+    }];
+   
     // 布局
     [phoneModelLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.centerX.equalTo(self.view);
-        make.centerY.equalTo(self.view).offset(20);
+        make.centerY.equalTo(self.view);
         
     }];
     [phoneVersionLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.centerX.equalTo(self.view);
         make.centerY.equalTo(phoneModelLabel).offset(20);
-       
+
     }];
     [iphoneMLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.centerX.equalTo(self.view);
-        make.centerY.equalTo(self.view).offset(-20);
-        
+        make.centerY.equalTo(phoneModelLabel).offset(-20);
+
     }];
     [batterylevelLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.centerY.equalTo(self.view);
-        make.centerX.equalTo(iphoneMLabel).offset(-20);
-        
-    }];
-    
-    
-    
-    
-    
-    
+        make.centerX.equalTo(self.view);
+        make.centerY.equalTo(phoneVersionLabel ).offset(20);
 
+    }];
+    [batterylevelStateLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerX.equalTo(self.view);
+        make.centerY.equalTo(batterylevelLabel).offset(20);
+    }];
+    [networkStateLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerX.equalTo(self.view);
+        make.centerY.equalTo(iphoneMLabel).offset(-20);
+    }];
+//
+    
+    
+    
+    
     
 }
 
@@ -276,20 +330,5 @@
     
 }
 
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end

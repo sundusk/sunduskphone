@@ -17,5 +17,6 @@ target 'iPhoneModel' do
   end
 
   pod 'Masonry'
+pod 'AFNetworking'
 
 end
